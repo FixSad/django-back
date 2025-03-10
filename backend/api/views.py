@@ -1,18 +1,17 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
-from .models import User
-from .serializers import UserSerializer, RegisterSerializer
+from .models import User, TestNSI, TestResults
+from .serializers import UserSerializer, RegisterSerializer, TestNSISerializer, TestResultsSerializer
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 
-from rest_framework.permissions import AllowAny, IsAuthenticated
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-#cd067b096474e1b8cdff2673d01ce35cbd663b00
+
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])  # Разрешаем доступ без аутентификации
     def register(self, request):
         serializer = RegisterSerializer(data=request.data)
@@ -37,3 +36,39 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         serializer = self.get_serializer(user)
         return Response(serializer.data)
+
+
+class ResultsViewSet(viewsets.ModelViewSet):
+    queryset = TestResults.objects.all()
+    serializer_class = TestResultsSerializer
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def add_result(self, request):
+        if not request.user.is_authenticated:
+            return Response({"error": "User is not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        print(f"User: {request.user}, Data: {request.data}")
+        data = request.data.copy()
+
+        # Передаем пользователя через контекст
+        serializer = TestResultsSerializer(data=data, context={'user': request.user})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print(f"Serializer errors: {serializer.errors}")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TestViewSet(viewsets.ModelViewSet):
+    queryset = TestNSI.objects.all()
+    serializer_class = TestNSISerializer
+
+    @action(detail=False, methods=['post'], permission_classes=[IsAdminUser])
+    def add_test(self, request):
+        if not request.user.is_staff:
+            return Response("Only for admins", status=status.HTTP_403_FORBIDDEN)
+        serializer = TestNSISerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
