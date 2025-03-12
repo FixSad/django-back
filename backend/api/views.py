@@ -12,8 +12,9 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    @action(detail=False, methods=['post'], permission_classes=[AllowAny])  # Разрешаем доступ без аутентификации
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def register(self, request):
+        print(request.data)
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -21,7 +22,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({'token': token.key}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['post'], permission_classes=[AllowAny])  # Разрешаем доступ без аутентификации
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def login(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -50,7 +51,6 @@ class ResultsViewSet(viewsets.ModelViewSet):
         print(f"User: {request.user}, Data: {request.data}")
         data = request.data.copy()
 
-        # Передаем пользователя через контекст
         serializer = TestResultsSerializer(data=data, context={'user': request.user})
         if serializer.is_valid():
             serializer.save()

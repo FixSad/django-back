@@ -40,7 +40,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'password2', 'age', 'education', 'specialty']
+        fields = [
+            'username', 'password', 'password2', 'age', 'education', 'specialty',
+            'residence', 'height', 'weight', 'dominant_hand', 'diseases',
+            'smoking', 'alcohol', 'sport', 'insomnia', 'current_mood', 'gamer'
+        ]
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -53,6 +57,17 @@ class RegisterSerializer(serializers.ModelSerializer):
             age=validated_data.get('age'),
             education=validated_data.get('education'),
             specialty=validated_data.get('specialty'),
+            residence=validated_data.get('residence'),
+            height=validated_data.get('height'),
+            weight=validated_data.get('weight'),
+            dominant_hand=validated_data.get('dominant_hand'),
+            diseases=validated_data.get('diseases'),
+            smoking=validated_data.get('smoking', False),
+            alcohol=validated_data.get('alcohol', False),
+            sport=validated_data.get('sport', False),
+            insomnia=validated_data.get('insomnia', False),
+            current_mood=validated_data.get('current_mood'),
+            gamer=validated_data.get('gamer', False),
         )
         user.set_password(validated_data['password'])
         user.save()
