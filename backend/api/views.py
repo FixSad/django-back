@@ -4,8 +4,10 @@ from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from .models import User, TestNSI, TestResults
-from .serializers import UserSerializer, RegisterSerializer, TestNSISerializer, TestResultsSerializer
+from .serializers import UserSerializer, RegisterSerializer, TestNSISerializer, TestResultsSerializer, UserUpdateSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from rest_framework.views import APIView
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -37,6 +39,17 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         serializer = self.get_serializer(user)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['put'], permission_classes=[IsAuthenticated])
+    def update_profile(self, request):
+        user = request.user
+        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 class ResultsViewSet(viewsets.ModelViewSet):
@@ -72,3 +85,22 @@ class TestViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        #Получение данных пользователя
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+    def put(self, request):
+        #Обновление данных пользователя
+        user = request.user
+        serializer = UserUpdateSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)

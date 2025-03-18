@@ -13,6 +13,19 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'username', 'age', 'education', 'specialty', 'residence',
+            'height', 'weight', 'dominant_hand', 'diseases', 'smoking',
+            'alcohol', 'sport', 'insomnia', 'current_mood', 'gamer'
+        ]
+        extra_kwargs = {
+            'username': {'read_only': True}  # Имя пользователя нельзя менять
+        }
+
+
 class TestResultsSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestResults
