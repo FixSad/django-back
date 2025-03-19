@@ -36,7 +36,7 @@ class TestNSISerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True, required=True)
+    password2 = serializers.CharField(write_only=True, required=False)  # Сделаем необязательным
 
     class Meta:
         model = User
@@ -47,11 +47,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        if attrs['password'] != attrs['password2']:
+        # Проверяем пароли только если password2 предоставлен
+        if 'password2' in attrs and attrs.get('password') != attrs.get('password2'):
             raise serializers.ValidationError({"password": "Пароли не совпадают."})
         return attrs
 
     def create(self, validated_data):
+        # Удаляем password2 из validated_data, если он есть
+        if 'password2' in validated_data:
+            validated_data.pop('password2')
+            
         user = User.objects.create(
             username=validated_data['username'],
             age=validated_data.get('age'),

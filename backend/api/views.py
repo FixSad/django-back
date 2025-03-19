@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view
 from django.contrib.auth import authenticate
 from .models import User, TestNSI, TestResults
 from .serializers import UserSerializer, RegisterSerializer, TestNSISerializer, TestResultsSerializer
@@ -14,8 +15,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def register(self, request):
-        print(request.data)
-        serializer = RegisterSerializer(data=request.data)
+        serializer = RegisterSerializer(data=request.data)  # Используем RegisterSerializer
         if serializer.is_valid():
             user = serializer.save()
             token, created = Token.objects.get_or_create(user=user)
@@ -26,7 +26,9 @@ class UserViewSet(viewsets.ModelViewSet):
     def login(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
+        print(f"Попытка входа: username={username}, password={password}")
         user = authenticate(username=username, password=password)
+        print(f"Результат аутентификации: {user}")
         if user:
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key}, status=status.HTTP_200_OK)
