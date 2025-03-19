@@ -1,7 +1,7 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser 
 from django.db import models
 
-class User(AbstractUser):
+class User(AbstractUser ):
     age = models.PositiveIntegerField(null=True, blank=True)
     education = models.CharField(max_length=100, null=True, blank=True)
     specialty = models.CharField(max_length=100, null=True, blank=True)
@@ -14,8 +14,28 @@ class User(AbstractUser):
     alcohol = models.BooleanField(default=False)
     sport = models.BooleanField(default=False)
     insomnia = models.BooleanField(default=False)
-    current_mood = models.CharField(max_length=100, null=True, blank=True)
+    current_mood = models.CharField(max_length=100, null=True, blank=True)  
     gamer = models.BooleanField(default=False)
+    
+    # Метод для получения информации о пользователе
+    def get_user_info(self):
+        return {
+            "username": self.username,
+            "age": self.age,
+            "education": self.education,
+            "specialty": self.specialty,
+            "residence": self.residence,
+            "height": self.height,
+            "weight": self.weight,
+            "dominant_hand": self.dominant_hand,
+            "diseases": self.diseases,
+            "smoking": self.smoking,
+            "alcohol": self.alcohol,
+            "sport": self.sport,
+            "insomnia": self.insomnia,
+            "current_mood": self.current_mood,
+            "gamer": self.gamer,
+        }
 
     class Meta:
         swappable = 'AUTH_USER_MODEL'
@@ -47,3 +67,4 @@ class TestResults(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.test.test_name} (Попытка {self.try_number})"
+    
