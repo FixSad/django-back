@@ -52,6 +52,14 @@ class ResultsViewSet(viewsets.ModelViewSet):
 
         print(f"User: {request.user}, Data: {request.data}")
         data = request.data.copy()
+        test = TestNSI.objects.get(test_name=request.data.get('test').get('test_name'))
+        data = {
+            'test': test.test_id,
+            'number_correct_answers': request.data.get('number_correct_answers'),
+            'number_all_answers': request.data.get('number_all_answers'),
+            'accuracy': request.data.get('accuracy'),
+            'try_number': request.data.get('try_number'),
+        }
 
         serializer = TestResultsSerializer(data=data, context={'user': request.user})
         if serializer.is_valid():
