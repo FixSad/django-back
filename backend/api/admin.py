@@ -22,7 +22,7 @@ def export_to_excel(modeladmin, request, queryset):
         "Заболевания": [result.user.diseases for result in queryset],
         "Курение": ["Да" if result.user.smoking else "Нет" for result in queryset],
         "Алкоголь": ["Да" if result.user.alcohol else "Нет" for result in queryset],
-        "Спорт": ["Да" if result.user.sport else "Нет" for result in queryset],
+        "Спорт": [result.user.sport for result in queryset],
         "Бессонница": ["Да" if result.user.insomnia else "Нет" for result in queryset],
         "Текущее настроение": [result.user.current_mood for result in queryset],
         "Геймер": ["Да" if result.user.gamer else "Нет" for result in queryset],

@@ -12,7 +12,7 @@ class User(AbstractUser):
     diseases = models.TextField(null=True, blank=True)
     smoking = models.BooleanField(default=False)
     alcohol = models.BooleanField(default=False)
-    sport = models.BooleanField(default=False)
+    sport = models.TextField(null=True, blank=True)
     insomnia = models.BooleanField(default=False)
     current_mood = models.CharField(max_length=100, null=True, blank=True)
     gamer = models.BooleanField(default=False)
